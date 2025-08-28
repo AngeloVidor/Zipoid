@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "GO+c0dXSovgqp9D2gj/WAxztSsj3CDet26hMpwarBoU=",
+  "Source": "Zipoid.API",
+  "BasePath": "_content/Zipoid.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
