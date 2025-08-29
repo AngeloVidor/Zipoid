@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AngleSharp.Io;
+using Models;
 using YoutubeExplode;
 using YoutubeExplode.Videos.Streams;
 
@@ -10,7 +11,7 @@ namespace Zipoid.API.Application
 {
     public class DownloadService : Domain.IDownload
     {
-        public async Task DownloadAudioAsync(string videoUrl, Guid userId)
+        public async Task<Download> DownloadAudioAsync(string videoUrl, Guid userId)
         {
             var youtube = new YoutubeClient();
 
@@ -30,7 +31,12 @@ namespace Zipoid.API.Application
             await using var fileStream = File.Create(outputFilePath);
             await stream.CopyToAsync(fileStream);
 
-            Console.WriteLine($"Áudio salvo em: {outputFilePath}");
+            return new Download
+            {
+                Title = safeTitle,
+                Url = videoUrl,
+                Path = outputFilePath
+            };
         }
     }
 }

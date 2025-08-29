@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Identity.Client.Extensions.Msal;
+using Models;
 using StackExchange.Redis;
 using Zipoid.API.Domain;
 using Zipoid.API.Domain.Entities;
@@ -17,48 +19,46 @@ namespace Zipoid.API.Infrastructure.Cache
             _redis = redis;
         }
 
-        public async Task StoreMetadataAsync(IEnumerable<Track> tracks)
+        public async Task StoreMetadataAsync(StorageCache data)
         {
             var tasks = new List<Task>();
 
-            foreach (var track in tracks)
+            var key = $"track:{data.Key}";
+            var entries = new HashEntry[]
             {
-                var key = $"track:{track.Id}";
-                var entries = new HashEntry[]
-                {
-                new HashEntry("artist", track.Artist),
-                new HashEntry("title", track.Title),
-                new HashEntry("album", track.Album)
-                };
+                new HashEntry("Path", data.Path),
+            };
 
-                tasks.Add(_redis.HashSetAsync(key, entries));
-            }
+            tasks.Add(_redis.HashSetAsync(key, entries));
 
             await Task.WhenAll(tasks);
         }
 
-        public async Task<List<Track>> GetMetadataAsync(IEnumerable<string> trackIds)
+        public async Task<List<StorageCache>> GetMetadataAsync()
         {
-            var tasks = trackIds.Select(async id =>
-            {
-                var key = $"track:{id}";
-                var entries = await _redis.HashGetAllAsync(key);
+            var endpoints = _redis.Multiplexer.GetEndPoints();
+            var server = _redis.Multiplexer.GetServer(endpoints.First());
 
+            var keys = server.Keys(pattern: "track:*").ToArray();
+
+            var tasks = keys.Select(async key =>
+            {
+                var entries = await _redis.HashGetAllAsync(key);
                 if (entries.Length == 0)
                     return null;
 
-                return new Track
+                return new StorageCache
                 {
-                    Id = id,
-                    Artist = entries.FirstOrDefault(e => e.Name == "artist").Value,
-                    Title = entries.FirstOrDefault(e => e.Name == "title").Value,
-                    Album = entries.FirstOrDefault(e => e.Name == "album").Value
+                    Key = key.ToString().Replace("track:", ""),
+                    Path = entries.FirstOrDefault(e => e.Name == "Path").Value
                 };
             });
 
             var results = await Task.WhenAll(tasks);
             return results.Where(t => t != null).ToList()!;
         }
+
+
 
     }
 }

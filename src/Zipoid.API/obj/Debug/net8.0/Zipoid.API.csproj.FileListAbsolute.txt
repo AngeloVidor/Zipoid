@@ -158,3 +158,4 @@ C:\Users\angel\Desktop\Zipoid\src\Zipoid.API\bin\Debug\net8.0\runtimes\win\lib\n
 C:\Users\angel\Desktop\Zipoid\src\Zipoid.API\bin\Debug\net8.0\DotNetEnv.dll
 C:\Users\angel\Desktop\Zipoid\src\Zipoid.API\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 C:\Users\angel\Desktop\Zipoid\src\Zipoid.API\bin\Debug\net8.0\Sprache.dll
+C:\Users\angel\Desktop\Zipoid\src\Zipoid.API\obj\Debug\net8.0\Zipoid.API.sourcelink.json

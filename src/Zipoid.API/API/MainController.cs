@@ -13,9 +13,12 @@ namespace Zipoid.API.API
     public class MainController : ControllerBase
     {
         private readonly ICoordinator _coordinator;
-        public MainController(ICoordinator coordinator)
+        private readonly ITrackMetadataCacher _trackMetadataCacher;
+
+        public MainController(ICoordinator coordinator, ITrackMetadataCacher trackMetadataCacher)
         {
             _coordinator = coordinator;
+            _trackMetadataCacher = trackMetadataCacher;
         }
 
         [HttpPost("process-playlist")]
@@ -27,5 +30,13 @@ namespace Zipoid.API.API
             await _coordinator.CoordinateAsync(playlistUrl, userId);
             return Ok("Playlist processing started.");
         }
+
+        [HttpGet("tracks")]
+        public async Task<IActionResult> GetAllTracks()
+        {
+            var tracks = await _trackMetadataCacher.GetMetadataAsync();
+            return Ok(tracks);
+        }
     }
+
 }
