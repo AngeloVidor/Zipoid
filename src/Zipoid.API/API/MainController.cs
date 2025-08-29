@@ -14,11 +14,13 @@ namespace Zipoid.API.API
     {
         private readonly ICoordinator _coordinator;
         private readonly ITrackMetadataCacher _trackMetadataCacher;
+        private readonly IOnDemand _onDemandService;
 
-        public MainController(ICoordinator coordinator, ITrackMetadataCacher trackMetadataCacher)
+        public MainController(ICoordinator coordinator, ITrackMetadataCacher trackMetadataCacher, IOnDemand onDemandService)
         {
             _coordinator = coordinator;
             _trackMetadataCacher = trackMetadataCacher;
+            _onDemandService = onDemandService;
         }
 
         [HttpPost("process-playlist")]
@@ -36,6 +38,38 @@ namespace Zipoid.API.API
         {
             var tracks = await _trackMetadataCacher.GetMetadataAsync();
             return Ok(tracks);
+        }
+
+        [HttpGet("tracks/{key}")]
+        public async Task<IActionResult> GetTrack(string key)
+        {
+            var track = await _trackMetadataCacher.GetTrackByKeyAsync(key);
+
+            if (track == null)
+                return NotFound($"Track with key '{key}' not found.");
+
+            return Ok(track);
+        }
+
+        [HttpPost("onDemand")]
+        public async Task<IActionResult> OnDemand([FromQuery] string key)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+                return BadRequest("Key is required.");
+
+            if (!HttpContext.Items.TryGetValue("userId", out var userIdObj) || userIdObj is not Guid userId || userId == Guid.Empty)
+                return BadRequest("User is not authenticated.");
+
+            try
+            {
+                await _onDemandService.HandleAsync(key, userId);
+                return Ok($"Download process started for track '{key}'.");
+            }
+            catch (Exception ex)
+            {
+                // aqui dá pra logar o erro se quiser
+                return StatusCode(500, $"Error processing track '{key}': {ex.Message}");
+            }
         }
     }
 

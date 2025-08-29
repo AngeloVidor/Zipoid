@@ -66,6 +66,8 @@ builder.Services.AddScoped<IDownload, DownloadService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IJsonWebToken, Zipoid.API.Application.Security.JsonWebToken>();
+builder.Services.AddScoped<IOnDemand, OnDemandService>();
+
 //TEST
 builder.Services.AddScoped<ICoordinator, Coordinator>();
 

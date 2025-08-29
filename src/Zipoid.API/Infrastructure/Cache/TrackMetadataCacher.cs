@@ -13,10 +13,12 @@ namespace Zipoid.API.Infrastructure.Cache
     public class TrackMetadataCacher : ITrackMetadataCacher
     {
         private readonly IDatabase _redis;
+        private readonly IDownload _downloader;
 
-        public TrackMetadataCacher(IDatabase redis)
+        public TrackMetadataCacher(IDatabase redis, IDownload downloader)
         {
             _redis = redis;
+            _downloader = downloader;
         }
 
         public async Task StoreMetadataAsync(StorageCache data)
@@ -58,7 +60,27 @@ namespace Zipoid.API.Infrastructure.Cache
             return results.Where(t => t != null).ToList()!;
         }
 
+        public async Task<bool> HasFileAsync(string key)
+        {
+            var redisKey = $"track:{key}";
+            var path = await _redis.HashGetAsync(redisKey, "Path");
 
+            return path.HasValue && path.ToString() != "pending";
+        }
 
+        public async Task<StorageCache?> GetTrackByKeyAsync(string key)
+        {
+            var redisKey = $"track:{key}";
+            var entries = await _redis.HashGetAllAsync(redisKey);
+
+            if (entries.Length == 0)
+                return null;
+
+            return new StorageCache
+            {
+                Key = key,
+                Path = entries.FirstOrDefault(e => e.Name == "Path").Value
+            };
+        }
     }
 }

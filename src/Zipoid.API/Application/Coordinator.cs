@@ -28,10 +28,10 @@ namespace Zipoid.API.Application
             Console.WriteLine($"Starting coordination for user {userId} and playlist {playlistUrl}");
             var tracks = await _spotifyPlaylistProvider.GetPlaylistTracksAsync(playlistUrl);
 
+            //download it
             var firstTenTracks = tracks.Take(10).ToList();
 
-
-            //don't download it now
+            //don't download it for now
             var remainderTracks = tracks.Skip(10).ToList();
 
             foreach (var track in firstTenTracks)
@@ -39,6 +39,11 @@ namespace Zipoid.API.Application
                 var searchResult = await _searchEngine.SearchAsync($"{track.Artist} - {track.Title}");
                 if (searchResult != null)
                 {
+                    if (await _metadataCacher.HasFileAsync(searchResult.Query))
+                    {
+                        Console.WriteLine($"Track {searchResult.Query} already cached. Skipping download.");
+                        continue;
+                    }
                     var response = await _downloader.DownloadAudioAsync(searchResult.Url, userId);
                     var data = new StorageCache
                     {
@@ -60,7 +65,6 @@ namespace Zipoid.API.Application
                         Path = "pending"
                     };
                     await _metadataCacher.StoreMetadataAsync(data);
-
                 }
             }
         }

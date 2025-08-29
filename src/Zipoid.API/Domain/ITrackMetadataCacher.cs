@@ -12,5 +12,7 @@ namespace Zipoid.API.Domain
     {
         Task StoreMetadataAsync(StorageCache data);
         Task<List<StorageCache>> GetMetadataAsync();
+        Task<bool> HasFileAsync(string key);
+        Task<StorageCache?> GetTrackByKeyAsync(string key);
     }
 }

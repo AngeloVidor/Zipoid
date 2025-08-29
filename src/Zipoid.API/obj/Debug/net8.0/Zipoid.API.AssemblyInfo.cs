@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Zipoid.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6c47afc3e4721719741debc160964af9e6c9c0de")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bedf220afbe6c083ed29eed847ca2b534dea38b7")]
 [assembly: System.Reflection.AssemblyProductAttribute("Zipoid.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Zipoid.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
